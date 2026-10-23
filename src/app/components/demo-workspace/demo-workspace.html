@@ -1,0 +1,18 @@
+<h1>Overview</h1>
+<div class="search-container" data-tour-target="search">
+  <input 
+    type="text" 
+    placeholder="Search..."
+    [formControl]="searchControl"
+  >
+</div>
+<button data-tour-target="create-project">New Project</button>
+<button data-tour-target="notifications">Notifications</button>
+<button data-tour-target="profile">Profile</button>
+
+@for (project of filteredProjects(); track project.id) {
+    <p>{{project.id}} - {{ project.name }} - {{ project.status }} - {{ project.members }} members</p>
+}
+@if (filteredProjects().length === 0) {
+    <p>No projects found.</p>
+}

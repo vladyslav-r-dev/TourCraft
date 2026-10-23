@@ -1,0 +1,14 @@
+<div class="builder">
+  <section class="editor">
+    <h2>{{ tour.title }}</h2>
+   @for (step of tour.steps; track step.id) {
+     <h3>{{ step.title }}</h3>
+     <p>{{ step.description }}</p>
+   } @empty {
+     <p>No steps yet</p>
+   }
+  </section>
+  <section class="workspace">
+    <app-demo-workspace />
+  </section>
+</div>
