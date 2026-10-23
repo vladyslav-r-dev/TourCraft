@@ -1,12 +1,53 @@
 <div class="builder">
   <section class="editor">
     <h2>{{ tour.title }}</h2>
+    
    @for (step of tour.steps; track step.id) {
-     <h3>{{ step.title }}</h3>
-     <p>{{ step.description }}</p>
-   } @empty {
+  <h3>{{ step.title }}</h3>
+  <p>{{ step.description }}</p>
+
+  <button type="button" (click)="startEdit(step.id)">
+    Edit
+  </button>
+
+  <button type="button" (click)="deleteStep(step.id)">
+    Delete
+  </button>
+
+  <button type="button" (click)="moveStep(step.id, 'up')">
+    ↑
+  </button>
+  <button type="button" (click)="moveStep(step.id, 'down')">
+    ↓
+  </button>
+    } @empty {
      <p>No steps yet</p>
    }
+  </section>
+  <section class="add-step">
+    <form
+    [formGroup]="editForm"
+    (ngSubmit)="editingStepId === null ? addStep() : saveChanges()"
+    >
+      <label for="title">Title</label>
+      <input id="title" formControlName="title" />
+
+      <label for="description">Description</label>
+      <input id="description" formControlName="description" />
+
+      <label for="targetId">Target</label>
+      <select id="targetId" formControlName="targetId">
+        @for(target of targets; track target.value) {
+          <option [value]="target.value">{{ target.label }}</option>
+        } @empty {
+          <option disabled>No targets available</option>
+        }
+      </select>
+
+      <button type="submit" [disabled]="editForm.invalid">
+        {{ editingStepId === null ? 'Add Step' : 'Save Changes' }}
+       </button>
+    </form>
   </section>
   <section class="workspace">
     <app-demo-workspace />
