@@ -1,0 +1,20 @@
+
+<div class="tour-tooltip">
+  <h3>{{ step().title }}</h3>
+  <p>{{ step().description }}</p>
+
+  <div class="tour-tooltip-actions">
+    <button
+      type="button"
+      [disabled]="stepIndex() === 0"
+      (click)="previousClicked.emit()">
+      Previous
+    </button>
+
+    <button
+      type="button"
+      (click)="nextClicked.emit()">
+      {{ stepIndex() === stepsCount() - 1 ? 'Finish' : 'Next' }}
+    </button>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 0;
+  z-index: 100;
+
+  width: 280px;
+  max-width: calc(100vw - 32px);
+}
+
+.tour-tooltip {
+  box-sizing: border-box;
+  padding: 18px;
+
+  background: #ffffff;
+  color: #1f2937;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+
+  h3 {
+    margin: 0 0 8px;
+
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  p {
+    margin: 0;
+
+    font-size: 14px;
+    line-height: 1.5;
+    color: #6b7280;
+  }
+}

@@ -1,14 +1,22 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import type { Tour } from '../../core/models/tour.model';
+import { TourTooltip } from '../tour-tooltip/tour-tooltip';
 
 @Component({
   selector: 'app-demo-workspace',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TourTooltip],
   templateUrl: './demo-workspace.html',
   styleUrl: './demo-workspace.scss',
 })
 export class DemoWorkspace {
+  
+  onNextClicked = output<void>();
+  onPreviousClicked = output<void>();
+  stepIndex = input<number>(0);
+  stepsCount = input<number>(0);
+
   protected projects: Project[] = [{
     id: 1,
     name: "Demo Project",
@@ -32,6 +40,8 @@ export class DemoWorkspace {
     status: "active",
     members: 2
   }];
+  activeTargetId = input<string | null>(null);
+  activeStep = input<Tour['steps'][number] | null>(null);
   protected searchControl = new FormControl('');
   protected searchQuery = signal('');
   protected filteredProjects = computed(() => {

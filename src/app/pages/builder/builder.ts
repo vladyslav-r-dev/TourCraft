@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { DemoWorkspace } from '../../components/demo-workspace/demo-workspace';
-import { Tour } from '../../core/models/tour.model';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { TourService  } from '../../core/services/tour';
 
 @Component({
   selector: 'app-builder',
@@ -10,31 +10,9 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angula
   styleUrl: './builder.scss',
 })
 export class Builder {
-  tour : Tour = {
-    id: 1,
-    title: 'Getting Started',
-    steps: [
-      {
-        id: 1,
-        title: 'Create your first project',
-        description: 'This is the first step.',
-        targetId: 'create-project'
-      },
-      {
-        id: 2,
-        title: 'Find your projects',
-        description: 'This is the second step.',
-        targetId: 'search'
-      },
-      {
-        id: 3,
-        title: 'Check notifications',
-        description: 'This is the third step.',
-        targetId: 'notifications'
-      }
-    ]
-  }
-
+  private tourService = inject(TourService);
+  tour = this.tourService.tour;
+  
   protected editForm = new FormGroup(
     {title: new FormControl('', {nonNullable: true, validators: [Validators.required] }), 
     description: new FormControl('', {nonNullable: true, validators: [Validators.required] }), 
@@ -59,7 +37,7 @@ export class Builder {
 
   const newStep = this.editForm.getRawValue();
 
-  this.tour.steps.push({
+  this.tourService.addStep({
     id: this.nextStepId++,
     title: newStep.title,
     description: newStep.description,
@@ -74,7 +52,7 @@ export class Builder {
   }
 
   deleteStep(stepId: number) {
-    this.tour.steps = this.tour.steps.filter(step => step.id !== stepId);
+    this.tourService.deleteStep(stepId);
   }
 
   startEdit(stepId: number) {
@@ -103,11 +81,7 @@ export class Builder {
     return;
   }
 
-  const values = this.editForm.getRawValue();
-
-  step.title = values.title;
-  step.description = values.description;
-  step.targetId = values.targetId;
+  this.tourService.saveChanges(this.editingStepId, this.editForm.getRawValue());
 
   this.editingStepId = null;
 
@@ -116,16 +90,9 @@ export class Builder {
     description: '',
     targetId: 'search'
   });
-}
+  }
+  
   moveStep(stepId: number, direction: 'up' | 'down') {
-    const index = this.tour.steps.findIndex(step => step.id === stepId);
-    if (index === -1) return;
-
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= this.tour.steps.length) return;
-
-    const temp = this.tour.steps[index];
-    this.tour.steps[index] = this.tour.steps[newIndex];
-    this.tour.steps[newIndex] = temp;
+  this.tourService.moveStep(stepId, direction);
   }
 }

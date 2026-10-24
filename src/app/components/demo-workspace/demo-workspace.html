@@ -1,18 +1,102 @@
+
 <h1>Overview</h1>
-<div class="search-container" data-tour-target="search">
-  <input 
-    type="text" 
+
+<div
+  class="search-container tour-target-anchor"
+  data-tour-target="search"
+  [class.tour-target-active]="activeTargetId() === 'search'">
+
+  <input
+    type="text"
     placeholder="Search..."
     [formControl]="searchControl"
-  >
+  />
+
+  @if (activeTargetId() === 'search') {
+    @if (activeStep(); as step) {
+      <app-tour-tooltip
+  [step]="step"
+  [stepIndex]="stepIndex()"
+  [stepsCount]="stepsCount()"
+  (nextClicked)="onNextClicked.emit()"
+  (previousClicked)="onPreviousClicked.emit()"
+    />
+    }
+  }
 </div>
-<button data-tour-target="create-project">New Project</button>
-<button data-tour-target="notifications">Notifications</button>
-<button data-tour-target="profile">Profile</button>
+
+<div class="tour-target-anchor">
+  <button
+    type="button"
+    data-tour-target="create-project"
+    [class.tour-target-active]="activeTargetId() === 'create-project'">
+    New Project
+  </button>
+
+  @if (activeTargetId() === 'create-project') {
+    @if (activeStep(); as step) {
+      <app-tour-tooltip
+  [step]="step"
+  [stepIndex]="stepIndex()"
+  [stepsCount]="stepsCount()"
+  (nextClicked)="onNextClicked.emit()"
+  (previousClicked)="onPreviousClicked.emit()"
+    />
+    }
+  }
+</div>
+
+<div class="tour-target-anchor">
+  <button
+    type="button"
+    data-tour-target="notifications"
+    [class.tour-target-active]="activeTargetId() === 'notifications'">
+    Notifications
+  </button>
+
+  @if (activeTargetId() === 'notifications') {
+    @if (activeStep(); as step) {
+      <app-tour-tooltip
+  [step]="step"
+  [stepIndex]="stepIndex()"
+  [stepsCount]="stepsCount()"
+  (nextClicked)="onNextClicked.emit()"
+  (previousClicked)="onPreviousClicked.emit()"
+    />
+    }
+  }
+</div>
+
+<div class="tour-target-anchor">
+  <button
+    type="button"
+    data-tour-target="profile"
+    [class.tour-target-active]="activeTargetId() === 'profile'">
+    Profile
+  </button>
+
+  @if (activeTargetId() === 'profile') {
+    @if (activeStep(); as step) {
+      <app-tour-tooltip
+  [step]="step"
+  [stepIndex]="stepIndex()"
+  [stepsCount]="stepsCount()"
+  (nextClicked)="onNextClicked.emit()"
+  (previousClicked)="onPreviousClicked.emit()"
+    />
+    }
+  }
+</div>
 
 @for (project of filteredProjects(); track project.id) {
-    <p>{{project.id}} - {{ project.name }} - {{ project.status }} - {{ project.members }} members</p>
+  <p>
+    {{ project.id }} -
+    {{ project.name }} -
+    {{ project.status }} -
+    {{ project.members }} members
+  </p>
 }
+
 @if (filteredProjects().length === 0) {
-    <p>No projects found.</p>
+  <p>No projects found.</p>
 }

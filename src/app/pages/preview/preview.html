@@ -1,1 +1,32 @@
-<p>preview works!</p>
+
+<div class="preview-container">
+
+  <app-demo-workspace
+    [activeTargetId]="isFinished ? null : (currentStep()?.targetId ?? null)"
+    [activeStep]="isFinished ? null : (currentStep() ?? null)"
+    [stepIndex]="currentStepIndex"
+    [stepsCount]="tour.steps.length"
+    (onNextClicked)="nextStep()"
+    (onPreviousClicked)="previousStep()"
+  />
+
+  @if (isFinished) {
+    <div class="tour-completed">
+      <h2>Tour completed!</h2>
+      <p>You've completed all steps.</p>
+
+      <button type="button" (click)="restartStep()">
+        Restart Tour
+      </button>
+    </div>
+  } @else if (tour.steps.length === 0) {
+    <p>No steps to preview.</p>
+  } @else {
+    <div class="preview-navigation">
+      <span>
+        Step {{ currentStepIndex + 1 }} of {{ tour.steps.length }}
+      </span>
+    </div>
+  }
+
+</div>
