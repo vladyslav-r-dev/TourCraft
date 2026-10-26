@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { effect, Injectable, signal } from '@angular/core';
 import { Tour } from '../models/tour.model';
 
 @Injectable({
@@ -6,7 +6,17 @@ import { Tour } from '../models/tour.model';
 })
 
 export class TourService  {
-  private readonly tourState = signal<Tour>({
+
+  constructor() {
+  effect(() => {
+    const state = this.tourState();
+    JSON.stringify(state)
+    localStorage.setItem('tourcraft-tour', JSON.stringify(state));
+  });
+  }
+
+ private readonly tourState = signal<Tour>(
+  this.loadTour() ??{
     id: 1,
     title: 'Getting Started',
     steps: [
@@ -33,6 +43,20 @@ export class TourService  {
 
   get tour(): Tour {
   return this.tourState();
+  }
+
+  private loadTour(): Tour | null {
+  try {
+    const storedTour = localStorage.getItem('tourcraft-tour');
+
+    if (!storedTour) {
+      return null;
+    }
+
+    return JSON.parse(storedTour) as Tour;
+  } catch {
+    return null;
+  }
   }
 
   addStep(step: Tour['steps'][number]) {
