@@ -1,3 +1,320 @@
-active {
-    font-weight: bold;
+.app-shell {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 32px 20px 22px;
+  height: 100dvh;
+
+  color: #dce0ec;
+
+  background: var(--sidebar);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 0 8px;
+
+  color: white;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+}
+
+.brand-dot {
+  margin-left: -10px;
+  color: #aa9eff;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+
+  width: 33px;
+  height: 35px;
+
+  background: var(--accent);
+  border-radius: 9px;
+}
+
+.brand-mark svg {
+  width: 25px;
+  height: 25px;
+}
+
+.workspace-label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  margin: 34px 0 30px;
+  padding: 12px 10px;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  border: 1px solid #363d50;
+  border-radius: 9px;
+}
+
+.workspace-label small {
+  display: block;
+  margin-top: 2px;
+  color: #a2acc0;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.workspace-avatar {
+  display: grid;
+  place-items: center;
+
+  width: 29px;
+  height: 29px;
+
+  color: #e2dcff;
+
+  background: #38405a;
+  border-radius: 7px;
+}
+
+.nav-label {
+  padding: 0 12px;
+  margin-bottom: 10px;
+  font-size: 9px;
+  letter-spacing: 1.6px;
+  color: #9ba6bc;
+}
+
+nav {
+  display: grid;
+  gap: 5px;
+}
+
+nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px;
+
+  font-size: 12px;
+  color: #b8c1d2;
+
+  border-radius: 8px;
+}
+
+nav a:hover {
+  color: white;
+  background: #ffffff09;
+}
+
+nav a.active {
+  color: #d9d1ff;
+  background: #5945e82e;
+  box-shadow: inset 3px 0 #9d8dff;
+}
+
+nav svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 28px 12px;
+  font-size: 11px;
+}
+
+.studio-icon {
+  display: block;
+  margin-bottom: 12px;
+  color: #a89cf7;
+  font-size: 24px;
+}
+
+.sidebar-bottom small {
+  display: block;
+  margin-top: 8px;
+  color: #9ba6bc;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.local-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 20px 12px 0;
+
+  color: #aeb8c9;
+  font-size: 10px;
+
+  border-top: 1px solid #343b4d;
+}
+
+.local-note span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #89c4aa;
+}
+
+.main-shell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  height: 70px;
+  padding: 0 40px;
+
+  font-size: 11px;
+  color: var(--muted);
+
+  border-bottom: 1px solid var(--border);
+  background: #ffffff80;
+}
+
+.topbar strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.separator {
+  margin: 0 12px;
+  color: #a9b0bf;
+}
+
+.edition {
+  font-size: 9px;
+  letter-spacing: 1.6px;
+}
+
+main {
+  flex: 1;
+  padding: 36px 40px;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 18px 40px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 16px;
+  z-index: 200;
+
+  padding: 12px;
+
+  opacity: 0;
+  background: white;
+  border-radius: 8px;
+
+  pointer-events: none;
+}
+
+.skip-link:focus {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 1200px) {
+  .app-shell {
+    grid-template-columns: 205px minmax(0, 1fr);
+  }
+
+  main {
+    padding: 28px 24px;
+  }
+
+  .topbar,
+  footer {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .sidebar {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    display: block;
+  }
+
+  .sidebar {
+    position: static;
+    gap: 18px;
+    height: auto;
+    padding: 16px;
+  }
+
+  .brand {
+    font-size: 20px;
+  }
+
+  .workspace-label,
+  .nav-label,
+  .sidebar-bottom,
+  .local-note {
+    display: none;
+  }
+
+  nav {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  nav a {
+    justify-content: center;
+  }
+
+  .topbar {
+    height: 48px;
+  }
+
+  .edition {
+    display: none;
+  }
+
+  main {
+    padding: 24px 16px;
+  }
+
+  footer {
+    padding: 16px;
+  }
+
+  footer span {
+    display: none;
+  }
 }

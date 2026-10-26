@@ -1,98 +1,113 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, inject, viewChild } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { DemoWorkspace } from '../../components/demo-workspace/demo-workspace';
-import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { TourService  } from '../../core/services/tour';
+import { TourService } from '../../core/services/tour';
 
 @Component({
   selector: 'app-builder',
-  imports: [DemoWorkspace, ReactiveFormsModule],
+  imports: [DemoWorkspace, ReactiveFormsModule, RouterLink],
   templateUrl: './builder.html',
   styleUrl: './builder.scss',
 })
 export class Builder {
-  private tourService = inject(TourService);
-  tour = this.tourService.tour;
-  
-  protected editForm = new FormGroup(
-    {title: new FormControl('', {nonNullable: true, validators: [Validators.required] }), 
-    description: new FormControl('', {nonNullable: true, validators: [Validators.required] }), 
-    targetId:new FormControl('', {nonNullable: true, validators: [Validators.required] })});
+  private readonly tourService = inject(TourService);
 
-    targets = [
-    { value: 'create-project', label: 'Create Project' },
-    { value: 'search', label: 'Search' },
+  private readonly titleInput = viewChild<ElementRef<HTMLInputElement>>('titleInput');
+
+  protected readonly storageIssue = this.tourService.storageIssue;
+
+  protected readonly editForm = new FormGroup({
+    title: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.pattern(/\S/)],
+    }),
+    description: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.pattern(/\S/)],
+    }),
+    targetId: new FormControl('create-project', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+  });
+
+  protected readonly targets = [
+    { value: 'create-project', label: 'New Project button' },
+    { value: 'search', label: 'Project search' },
     { value: 'notifications', label: 'Notifications' },
-    { value: 'profile', label: 'Profile' }
+    { value: 'profile', label: 'Profile' },
   ];
 
-  private nextStepId =
-  Math.max(0, ...this.tour.steps.map(step => step.id)) + 1;
-
   protected editingStepId: number | null = null;
+  protected announcement = '';
 
-  addStep() {
-  if (this.editForm.invalid) {
-    return;
+  get tour() {
+    return this.tourService.tour;
   }
 
-  const newStep = this.editForm.getRawValue();
-
-  this.tourService.addStep({
-    id: this.nextStepId++,
-    title: newStep.title,
-    description: newStep.description,
-    targetId: newStep.targetId
-  });
-
-  this.editForm.reset({
-    title: '',
-    description: '',
-    targetId: 'search'
-  });
+  protected targetLabel(targetId: string): string {
+    return this.targets.find((target) => target.value === targetId)?.label ?? targetId;
   }
 
-  deleteStep(stepId: number) {
+  addStep(): void {
+    if (this.editForm.invalid) {
+      this.editForm.markAllAsTouched();
+      return;
+    }
+
+    this.tourService.addStep(this.editForm.getRawValue());
+    this.cancelEdit();
+
+    this.announcement = 'Step added to your tour.';
+  }
+
+  deleteStep(stepId: number): void {
     this.tourService.deleteStep(stepId);
+
+    if (this.editingStepId === stepId) {
+      this.cancelEdit();
+    }
+
+    this.announcement = 'Step deleted.';
   }
 
-  startEdit(stepId: number) {
-    const step = this.tour.steps.find(s => s.id === stepId);
-    if (!step) return;
+  startEdit(stepId: number): void {
+    const step = this.tour.steps.find((step) => step.id === stepId);
+
+    if (!step) {
+      return;
+    }
 
     this.editingStepId = stepId;
-
-    this.editForm.patchValue({
+    this.editForm.reset({
       title: step.title,
       description: step.description,
-      targetId: step.targetId
+      targetId: step.targetId,
     });
+
+    this.titleInput()?.nativeElement.focus();
   }
 
-  saveChanges() {
-  if (this.editForm.invalid || this.editingStepId === null) {
-    return;
+  saveChanges(): void {
+    if (this.editForm.invalid || this.editingStepId === null) {
+      this.editForm.markAllAsTouched();
+      return;
+    }
+
+    this.tourService.saveChanges(this.editingStepId, this.editForm.getRawValue());
+    this.cancelEdit();
+
+    this.announcement = 'Step changes saved.';
   }
 
-  const step = this.tour.steps.find(
-    step => step.id === this.editingStepId
-  );
-
-  if (!step) {
-    return;
+  cancelEdit(): void {
+    this.editingStepId = null;
+    this.editForm.reset({ title: '', description: '', targetId: 'create-project' });
   }
 
-  this.tourService.saveChanges(this.editingStepId, this.editForm.getRawValue());
-
-  this.editingStepId = null;
-
-  this.editForm.reset({
-    title: '',
-    description: '',
-    targetId: 'search'
-  });
-  }
-  
-  moveStep(stepId: number, direction: 'up' | 'down') {
-  this.tourService.moveStep(stepId, direction);
+  moveStep(stepId: number, direction: 'up' | 'down'): void {
+    this.tourService.moveStep(stepId, direction);
+    this.announcement = `Step moved ${direction}.`;
   }
 }

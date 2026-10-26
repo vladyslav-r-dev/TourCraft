@@ -1,6 +1,6 @@
 export interface TourStep {
-    id: number;
-    title: string;
-    description: string;
-    targetId: string;
+  id: number;
+  title: string;
+  description: string;
+  targetId: string;
 }

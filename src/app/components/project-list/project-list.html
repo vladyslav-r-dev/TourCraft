@@ -1,0 +1,83 @@
+<div class="project-table">
+  <table>
+    <caption class="sr-only">Workspace projects</caption>
+
+    <thead>
+      <tr>
+        <th scope="col">Project name</th>
+        <th scope="col">Status</th>
+        <th
+          scope="col"
+          class="members-column"
+        >
+          Team
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (project of projects(); track project.id) {
+        <tr>
+          <td>
+            <div class="project-name">
+              <span
+                class="project-icon"
+                aria-hidden="true"
+              >
+                {{ project.name.charAt(0).toUpperCase() }}
+              </span>
+              <span>
+                {{ project.name }}
+                <small>PRJ-{{ project.id.toString().padStart(3, '0') }}</small>
+              </span>
+            </div>
+          </td>
+
+          <td>
+            <span
+              class="project-status"
+              [class]="'project-status ' + project.status"
+            >
+              <i></i>
+              {{
+                project.status === 'active'
+                  ? 'In progress'
+                  : project.status === 'paused'
+                    ? 'Paused'
+                    : 'Completed'
+              }}
+            </span>
+          </td>
+
+          <td class="members-column">
+            <span
+              class="members"
+              [attr.aria-label]="project.members + ' members'"
+            >
+              <span aria-hidden="true">{{ project.members }}</span>
+              members
+            </span>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td
+            colspan="3"
+            class="no-results"
+          >
+            <h3>No projects found</h3>
+            <p>Try another name or clear your search.</p>
+
+            <button
+              class="btn btn-quiet"
+              type="button"
+              (click)="clearSearch.emit()"
+            >
+              Clear search
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

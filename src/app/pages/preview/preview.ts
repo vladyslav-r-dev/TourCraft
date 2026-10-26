@@ -1,49 +1,49 @@
-import { Component, inject } from '@angular/core';
-import { TourService } from '../../core/services/tour';
+import { Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { DemoWorkspace } from '../../components/demo-workspace/demo-workspace';
+import { TourService } from '../../core/services/tour';
 
 @Component({
   selector: 'app-preview',
-  imports: [DemoWorkspace],
+  imports: [DemoWorkspace, RouterLink],
   templateUrl: './preview.html',
   styleUrl: './preview.scss',
 })
+
 export class Preview {
+  private readonly tourService = inject(TourService);
 
-  isFinished = false;
-
-  tourService = inject(TourService);
+  readonly isFinished = signal(false);
+  readonly currentStepIndex = signal(0);
 
   get tour() {
-  return this.tourService.tour;
+    return this.tourService.tour;
   }
-
-  currentStepIndex = 0;
 
   currentStep() {
-  return this.tour.steps.at(this.currentStepIndex);
+    return this.tour.steps.at(this.currentStepIndex());
   }
 
-  nextStep() {
-  if (this.isFinished || this.tour.steps.length === 0) {
-    return;
-  }
+  nextStep(): void {
+    if (this.isFinished() || this.tour.steps.length === 0) {
+      return;
+    }
 
-  if (this.currentStepIndex < this.tour.steps.length - 1) {
-    this.currentStepIndex++;
-  } else {
-    this.isFinished = true;
-  }
-  }
-
-  previousStep() {
-    if (this.currentStepIndex > 0) {
-      this.currentStepIndex--;
+    if (this.currentStepIndex() < this.tour.steps.length - 1) {
+      this.currentStepIndex.update((index) => index + 1);
+    } else {
+      this.isFinished.set(true);
     }
   }
 
-  restartStep() {
-    this.currentStepIndex = 0;
-    this.isFinished = false;
+  previousStep(): void {
+    if (!this.isFinished() && this.currentStepIndex() > 0) {
+      this.currentStepIndex.update((index) => index - 1);
+    }
+  }
+
+  restartStep(): void {
+    this.currentStepIndex.set(0);
+    this.isFinished.set(false);
   }
 }

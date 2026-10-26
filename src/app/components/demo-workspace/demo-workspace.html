@@ -1,102 +1,241 @@
-
-<h1>Overview</h1>
-
 <div
-  class="search-container tour-target-anchor"
-  data-tour-target="search"
-  [class.tour-target-active]="activeTargetId() === 'search'">
+  class="demo-workspace"
+  #workspace
+>
+  <div class="workspace-topbar">
+    <div class="demo-brand">
+      <span aria-hidden="true">a</span>
+      acme
+      <span class="demo-divider">/</span>
+      <span class="workspace-name">Workspace</span>
+    </div>
 
-  <input
-    type="text"
-    placeholder="Search..."
-    [formControl]="searchControl"
-  />
+    <div class="account-actions">
+      <button
+        class="notification-button"
+        type="button"
+        data-tour-target="notifications"
+        [class.tour-target-active]="activeTargetId() === 'notifications'"
+        [attr.aria-expanded]="openPanel() === 'notifications'"
+        aria-label="Notifications"
+        (click)="togglePanel('notifications')"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" />
+        </svg>
 
-  @if (activeTargetId() === 'search') {
-    @if (activeStep(); as step) {
-      <app-tour-tooltip
-  [step]="step"
-  [stepIndex]="stepIndex()"
-  [stepsCount]="stepsCount()"
-  (nextClicked)="onNextClicked.emit()"
-  (previousClicked)="onPreviousClicked.emit()"
-    />
+        @if (!notificationRead()) {
+          <span class="notification-dot"></span>
+        }
+      </button>
+
+      <button
+        class="avatar"
+        type="button"
+        data-tour-target="profile"
+        [class.tour-target-active]="activeTargetId() === 'profile'"
+        [attr.aria-expanded]="openPanel() === 'profile'"
+        aria-label="Profile"
+        (click)="togglePanel('profile')"
+      >
+        JD
+      </button>
+    </div>
+  </div>
+
+  @if (openPanel() === 'notifications') {
+    <section
+      class="utility-panel"
+      aria-label="Notifications"
+    >
+      <div class="utility-heading">
+        <h3>Notifications</h3>
+        <button
+          class="btn btn-quiet"
+          type="button"
+          (click)="openPanel.set(null)"
+          aria-label="Close notifications"
+        >
+          &times;
+        </button>
+      </div>
+
+      <p>
+        {{
+          notificationRead()
+            ? 'You are all caught up.'
+            : 'Welcome to your workspace. Your projects are ready to explore.'
+        }}
+      </p>
+
+      @if (!notificationRead()) {
+        <button
+          class="btn"
+          type="button"
+          (click)="notificationRead.set(true)"
+        >
+          Mark as read
+        </button>
+      }
+    </section>
+  }
+
+  @if (openPanel() === 'profile') {
+    <section
+      class="utility-panel"
+      aria-label="Your profile"
+    >
+      <div class="utility-heading">
+        <h3>Jamie Davis</h3>
+        <button
+          class="btn btn-quiet"
+          type="button"
+          (click)="openPanel.set(null)"
+          aria-label="Close profile"
+        >
+          &times;
+        </button>
+      </div>
+
+      <p>Workspace owner &middot; Demo profile</p>
+      <p>This sample workspace is yours to explore. Projects reset when you leave this page.</p>
+    </section>
+  }
+
+  <div class="workspace-body">
+    <div class="overview-heading">
+      <div>
+        <p class="eyebrow">Your team, in sync</p>
+        <h2>Project overview</h2>
+        <p>A home for your team's next big idea.</p>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div>
+        <span>Total projects</span>
+        <strong>{{ projects().length.toString().padStart(2, '0') }}</strong>
+        <small>Across your workspace</small>
+      </div>
+
+      <div>
+        <span>In progress</span>
+        <strong>{{ activeProjects().toString().padStart(2, '0') }}</strong>
+        <small>
+          <i class="status-dot"></i>
+          Moving things forward
+        </small>
+      </div>
+
+      <div>
+        <span>Completed</span>
+        <strong>{{ completedProjects().toString().padStart(2, '0') }}</strong>
+        <small>Ready for what's next</small>
+      </div>
+    </div>
+
+    <div class="projects-title">
+      <h3>
+        All projects
+        <span>{{ projects().length }}</span>
+      </h3>
+      <span class="table-caption">Your team's latest work</span>
+    </div>
+
+    <div class="project-toolbar">
+      <div
+        class="search-container"
+        data-tour-target="search"
+        [class.tour-target-active]="activeTargetId() === 'search'"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <circle
+            cx="10.5"
+            cy="10.5"
+            r="6.5"
+          />
+          <path d="m16 16 4 4" />
+        </svg>
+        <input
+          type="search"
+          placeholder="Search projects..."
+          aria-label="Search projects"
+          [formControl]="searchControl"
+        />
+      </div>
+
+      <button
+        class="btn btn-primary"
+        type="button"
+        data-tour-target="create-project"
+        [class.tour-target-active]="activeTargetId() === 'create-project'"
+        [attr.aria-expanded]="openPanel() === 'create'"
+        (click)="togglePanel('create')"
+      >
+        <span aria-hidden="true">+</span>
+        New Project
+      </button>
+    </div>
+
+    @if (openPanel() === 'create') {
+      <form
+        class="create-project"
+        (submit)="$event.preventDefault(); createProject()"
+      >
+        <label for="project-name">Project name</label>
+        <input
+          id="project-name"
+          [formControl]="projectName"
+          placeholder="Give your next idea a name"
+        />
+
+        <div>
+          <button
+            class="btn"
+            type="button"
+            (click)="openPanel.set(null)"
+          >
+            Cancel
+          </button>
+
+          <button
+            class="btn btn-primary"
+            type="submit"
+            [disabled]="!projectName.value.trim()"
+          >
+            Create project
+          </button>
+        </div>
+      </form>
     }
+
+    <app-project-list
+      [projects]="filteredProjects()"
+      (clearSearch)="searchControl.reset()"
+    />
+
+    <div class="workspace-footer">
+      <span>{{ filteredProjects().length }} of {{ projects().length }} projects</span>
+      <span>Demo workspace &middot; Explore freely</span>
+    </div>
+  </div>
+
+  @if (activeStep(); as step) {
+    <app-tour-tooltip
+      [step]="step"
+      [stepIndex]="stepIndex()"
+      [stepsCount]="stepsCount()"
+      [workspace]="workspace"
+      (nextClicked)="onNextClicked.emit()"
+      (previousClicked)="onPreviousClicked.emit()"
+    />
   }
 </div>
-
-<div class="tour-target-anchor">
-  <button
-    type="button"
-    data-tour-target="create-project"
-    [class.tour-target-active]="activeTargetId() === 'create-project'">
-    New Project
-  </button>
-
-  @if (activeTargetId() === 'create-project') {
-    @if (activeStep(); as step) {
-      <app-tour-tooltip
-  [step]="step"
-  [stepIndex]="stepIndex()"
-  [stepsCount]="stepsCount()"
-  (nextClicked)="onNextClicked.emit()"
-  (previousClicked)="onPreviousClicked.emit()"
-    />
-    }
-  }
-</div>
-
-<div class="tour-target-anchor">
-  <button
-    type="button"
-    data-tour-target="notifications"
-    [class.tour-target-active]="activeTargetId() === 'notifications'">
-    Notifications
-  </button>
-
-  @if (activeTargetId() === 'notifications') {
-    @if (activeStep(); as step) {
-      <app-tour-tooltip
-  [step]="step"
-  [stepIndex]="stepIndex()"
-  [stepsCount]="stepsCount()"
-  (nextClicked)="onNextClicked.emit()"
-  (previousClicked)="onPreviousClicked.emit()"
-    />
-    }
-  }
-</div>
-
-<div class="tour-target-anchor">
-  <button
-    type="button"
-    data-tour-target="profile"
-    [class.tour-target-active]="activeTargetId() === 'profile'">
-    Profile
-  </button>
-
-  @if (activeTargetId() === 'profile') {
-    @if (activeStep(); as step) {
-      <app-tour-tooltip
-  [step]="step"
-  [stepIndex]="stepIndex()"
-  [stepsCount]="stepsCount()"
-  (nextClicked)="onNextClicked.emit()"
-  (previousClicked)="onPreviousClicked.emit()"
-    />
-    }
-  }
-</div>
-
-@for (project of filteredProjects(); track project.id) {
-  <p>
-    {{ project.id }} -
-    {{ project.name }} -
-    {{ project.status }} -
-    {{ project.members }} members
-  </p>
-}
-
-@if (filteredProjects().length === 0) {
-  <p>No projects found.</p>
-}

@@ -1,39 +1,104 @@
 :host {
-  display: block;
-  position: absolute;
-  top: calc(100% + 14px);
-  left: 0;
+  position: fixed;
   z-index: 100;
 
-  width: 280px;
+  display: block;
+
+  width: 332px;
   max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+
+  border: 1px solid #d9d2ff;
+  border-top: 3px solid var(--accent);
+  border-radius: 12px;
+  background: white;
+  box-shadow:
+    0 18px 55px #25203c26,
+    0 4px 12px #25203c12;
+
+  animation: arrive 180ms ease-out;
 }
 
 .tour-tooltip {
-  box-sizing: border-box;
-  padding: 18px;
+  padding: 22px;
+}
 
-  background: #ffffff;
-  color: #1f2937;
+.tooltip-meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
 
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  margin-bottom: 16px;
 
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  color: var(--accent);
+}
 
-  h3 {
-    margin: 0 0 8px;
+.tooltip-meta > span:last-child {
+  margin-left: auto;
+  color: var(--muted);
+  letter-spacing: 0;
+}
 
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.4;
+.tooltip-symbol {
+  font-size: 17px;
+}
+
+h3 {
+  margin-bottom: 9px;
+  overflow-wrap: anywhere;
+  font-size: 17px;
+  line-height: 1.4;
+  letter-spacing: -0.3px;
+}
+
+h3:focus {
+  outline: none;
+}
+
+p {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+  white-space: pre-line;
+}
+
+.tooltip-progress {
+  height: 3px;
+  margin: 22px 0 18px;
+  overflow: hidden;
+  background: #f0edf9;
+  border-radius: 2px;
+}
+
+.tooltip-progress span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width 180ms;
+}
+
+.tooltip-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tooltip-actions .btn {
+  font-size: 12px;
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
   }
 
-  p {
-    margin: 0;
-
-    font-size: 14px;
-    line-height: 1.5;
-    color: #6b7280;
+  to {
+    opacity: 1;
   }
 }

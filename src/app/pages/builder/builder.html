@@ -1,55 +1,277 @@
-<div class="builder">
-  <section class="editor">
-    <h2>{{ tour.title }}</h2>
-    
-   @for (step of tour.steps; track step.id) {
-  <h3>{{ step.title }}</h3>
-  <p>{{ step.description }}</p>
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">Create a great first experience</p>
+    <h1>Tour Builder</h1>
+    <p>A little guidance goes a long way. Make every step count.</p>
+  </div>
 
-  <button type="button" (click)="startEdit(step.id)">
-    Edit
-  </button>
-
-  <button type="button" (click)="deleteStep(step.id)">
-    Delete
-  </button>
-
-  <button type="button" (click)="moveStep(step.id, 'up')">
-    ↑
-  </button>
-  <button type="button" (click)="moveStep(step.id, 'down')">
-    ↓
-  </button>
-    } @empty {
-     <p>No steps yet</p>
-   }
-  </section>
-  <section class="add-step">
-    <form
-    [formGroup]="editForm"
-    (ngSubmit)="editingStepId === null ? addStep() : saveChanges()"
-    >
-      <label for="title">Title</label>
-      <input id="title" formControlName="title" />
-
-      <label for="description">Description</label>
-      <input id="description" formControlName="description" />
-
-      <label for="targetId">Target</label>
-      <select id="targetId" formControlName="targetId">
-        @for(target of targets; track target.value) {
-          <option [value]="target.value">{{ target.label }}</option>
-        } @empty {
-          <option disabled>No targets available</option>
-        }
-      </select>
-
-      <button type="submit" [disabled]="editForm.invalid">
-        {{ editingStepId === null ? 'Add Step' : 'Save Changes' }}
-       </button>
-    </form>
-  </section>
-  <section class="workspace">
-    <app-demo-workspace />
-  </section>
+  <a
+    class="btn btn-primary"
+    routerLink="/preview"
+  >
+    <span aria-hidden="true">&#9655;</span>
+    Preview tour
+  </a>
 </div>
+
+@if (storageIssue()) {
+  <p
+    class="storage-warning"
+    role="status"
+  >
+    Browser storage is unavailable or contains unreadable data. Changes may only be kept for this
+    session.
+  </p>
+}
+
+<div class="builder-grid">
+  <section
+    class="panel editor"
+    aria-labelledby="tour-title"
+  >
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">Your onboarding tour</p>
+        <h2 id="tour-title">{{ tour.title }}</h2>
+      </div>
+
+      <span class="badge">{{ tour.steps.length }} steps</span>
+    </div>
+
+    <div class="steps-heading">
+      <span>TOUR STEPS</span>
+      <span>In the order your users see them</span>
+    </div>
+
+    <ol class="step-list">
+      @for (
+        step of tour.steps;
+        track step.id;
+        let index = $index;
+        let first = $first;
+        let last = $last
+      ) {
+        <li
+          class="step-card"
+          [class.editing]="editingStepId === step.id"
+        >
+          <span class="step-number">{{ index + 1 }}</span>
+
+          <div class="step-content">
+            <h3>{{ step.title }}</h3>
+            <p>{{ step.description }}</p>
+            <span class="target-label">
+              <span aria-hidden="true">&#8982;</span>
+              {{ targetLabel(step.targetId) }}
+            </span>
+
+            <div class="step-actions">
+              <button
+                type="button"
+                (click)="startEdit(step.id)"
+                [attr.aria-label]="'Edit step ' + (index + 1)"
+              >
+                Edit
+              </button>
+
+              <button
+                class="delete-action"
+                type="button"
+                (click)="deleteStep(step.id)"
+                [attr.aria-label]="'Delete step ' + (index + 1)"
+              >
+                Delete
+              </button>
+
+              <span class="action-spacer"></span>
+
+              <button
+                class="move-action"
+                type="button"
+                [disabled]="first"
+                (click)="moveStep(step.id, 'up')"
+                [attr.aria-label]="'Move step ' + (index + 1) + ' up'"
+              >
+                &#8593;
+              </button>
+
+              <button
+                class="move-action"
+                type="button"
+                [disabled]="last"
+                (click)="moveStep(step.id, 'down')"
+                [attr.aria-label]="'Move step ' + (index + 1) + ' down'"
+              >
+                &#8595;
+              </button>
+            </div>
+          </div>
+        </li>
+      } @empty {
+        <li class="empty-state">
+          <h3>Your story starts with a step</h3>
+          <p>Add your first step below, then bring it to life in Preview.</p>
+        </li>
+      }
+    </ol>
+
+    <div class="step-form">
+      <div class="form-heading">
+        <span
+          class="form-icon"
+          aria-hidden="true"
+        >
+          @if (editingStepId === null) {
+            +
+          } @else {
+            &#8599;
+          }
+        </span>
+
+        <div>
+          <h2>{{ editingStepId === null ? 'Add a new step' : 'Edit tour step' }}</h2>
+          <p>
+            {{
+              editingStepId === null
+                ? 'Point users in the right direction.'
+                : 'Fine-tune this moment in your tour.'
+            }}
+          </p>
+        </div>
+      </div>
+
+      <form
+        [formGroup]="editForm"
+        (ngSubmit)="editingStepId === null ? addStep() : saveChanges()"
+      >
+        <div class="field">
+          <label for="title">
+            Step title
+            <span>Required</span>
+          </label>
+          <input
+            #titleInput
+            id="title"
+            formControlName="title"
+            placeholder="e.g. Create your first project"
+            [attr.aria-invalid]="editForm.controls.title.touched && editForm.controls.title.invalid"
+            aria-describedby="title-error"
+          />
+          <span
+            id="title-error"
+            class="field-error"
+          >
+            @if (editForm.controls.title.touched && editForm.controls.title.invalid) {
+              Give this step a title.
+            }
+          </span>
+        </div>
+
+        <div class="field">
+          <label for="description">
+            Description
+            <span>Required</span>
+          </label>
+          <textarea
+            id="description"
+            formControlName="description"
+            placeholder="What should your users know?"
+            [attr.aria-invalid]="
+              editForm.controls.description.touched && editForm.controls.description.invalid
+            "
+            aria-describedby="description-error"
+          ></textarea>
+          <span
+            id="description-error"
+            class="field-error"
+          >
+            @if (editForm.controls.description.touched && editForm.controls.description.invalid) {
+              Add a short explanation for your users.
+            }
+          </span>
+        </div>
+
+        <div class="field">
+          <label for="targetId">Highlight target</label>
+          <select
+            id="targetId"
+            formControlName="targetId"
+            aria-describedby="target-hint"
+          >
+            @for (target of targets; track target.value) {
+              <option [value]="target.value">{{ target.label }}</option>
+            }
+          </select>
+          <p
+            id="target-hint"
+            class="field-hint"
+          >
+            The workspace element this step will highlight.
+          </p>
+        </div>
+
+        <div class="form-actions">
+          @if (editingStepId !== null) {
+            <button
+              class="btn"
+              type="button"
+              (click)="cancelEdit()"
+            >
+              Cancel
+            </button>
+          }
+
+          <button
+            class="btn btn-primary"
+            type="submit"
+            [disabled]="editForm.invalid"
+          >
+            {{ editingStepId === null ? '+ Add Step' : 'Save Changes' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <aside
+    class="workspace-column"
+    aria-labelledby="workspace-title"
+  >
+    <section class="panel workspace-panel">
+      <div class="panel-heading">
+        <div>
+          <h2 id="workspace-title">Live Workspace</h2>
+          <p>The product your tour brings to life.</p>
+        </div>
+
+        <span class="badge demo-badge">
+          <span></span>
+          Demo
+        </span>
+      </div>
+
+      <app-demo-workspace />
+    </section>
+
+    <div class="workspace-tip">
+      <span aria-hidden="true">&#9678;</span>
+      <p>
+        <strong>Build with the big picture in mind.</strong>
+        Choose a target for each step, then open Preview to walk through the experience your users
+        will see.
+      </p>
+    </div>
+
+    <div class="save-note">
+      <span aria-hidden="true">&#8627;</span>
+      Changes save automatically in this browser.
+    </div>
+  </aside>
+</div>
+
+<p
+  class="sr-only"
+  role="status"
+>
+  {{ announcement }}
+</p>

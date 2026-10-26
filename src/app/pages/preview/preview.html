@@ -1,32 +1,103 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">See it through their eyes</p>
+    <h1>Interactive Preview</h1>
+    <p>Your tour, just as your users will experience it.</p>
+  </div>
 
-<div class="preview-container">
+  <a
+    class="btn"
+    routerLink="/"
+  >
+    &larr; Back to builder
+  </a>
+</div>
+
+<div class="preview-panel panel">
+  <div class="panel-heading">
+    <div>
+      <h2>{{ tour.title }}</h2>
+      <p>{{ tour.steps.length }} steps &middot; Interactive product walkthrough</p>
+    </div>
+
+    <span class="badge preview-badge">Preview mode</span>
+  </div>
+
+  @if (tour.steps.length === 0) {
+    <div class="empty-state">
+      <span
+        class="completion-icon"
+        aria-hidden="true"
+      >
+        +
+      </span>
+      <h2>A great tour starts with one step</h2>
+      <p>Add a step in the Builder to start guiding users through your workspace.</p>
+
+      <a
+        class="btn btn-primary"
+        routerLink="/"
+      >
+        Create your first step
+      </a>
+    </div>
+  } @else if (isFinished()) {
+    <div
+      class="empty-state completed"
+      role="status"
+    >
+      <span
+        class="completion-icon"
+        aria-hidden="true"
+      >
+        &#10003;
+      </span>
+      <p class="eyebrow">That's a wrap</p>
+      <h2>You're ready to make a great first impression.</h2>
+      <p>
+        Tour completed! You've walked through all {{ tour.steps.length }} steps of {{ tour.title }}.
+      </p>
+
+      <div class="completion-actions">
+        <button
+          class="btn btn-primary"
+          type="button"
+          (click)="restartStep()"
+        >
+          &#8635; Restart Tour
+        </button>
+
+        <a
+          class="btn"
+          routerLink="/"
+        >
+          Keep editing
+        </a>
+      </div>
+    </div>
+  } @else {
+    <div class="preview-status">
+      <span class="live-indicator"></span>
+      <span>Tour in progress</span>
+      <strong>Step {{ currentStepIndex() + 1 }} of {{ tour.steps.length }}</strong>
+      <button
+        class="btn btn-quiet"
+        type="button"
+        (click)="restartStep()"
+      >
+        &#8635; Restart Tour
+      </button>
+    </div>
+  }
 
   <app-demo-workspace
-    [activeTargetId]="isFinished ? null : (currentStep()?.targetId ?? null)"
-    [activeStep]="isFinished ? null : (currentStep() ?? null)"
-    [stepIndex]="currentStepIndex"
+    [activeTargetId]="isFinished() ? null : (currentStep()?.targetId ?? null)"
+    [activeStep]="isFinished() ? null : (currentStep() ?? null)"
+    [stepIndex]="currentStepIndex()"
     [stepsCount]="tour.steps.length"
     (onNextClicked)="nextStep()"
     (onPreviousClicked)="previousStep()"
   />
-
-  @if (isFinished) {
-    <div class="tour-completed">
-      <h2>Tour completed!</h2>
-      <p>You've completed all steps.</p>
-
-      <button type="button" (click)="restartStep()">
-        Restart Tour
-      </button>
-    </div>
-  } @else if (tour.steps.length === 0) {
-    <p>No steps to preview.</p>
-  } @else {
-    <div class="preview-navigation">
-      <span>
-        Step {{ currentStepIndex + 1 }} of {{ tour.steps.length }}
-      </span>
-    </div>
-  }
-
 </div>
+
+<p class="preview-note">This is a live demo. Try the workspace controls as you follow your tour.</p>

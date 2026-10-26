@@ -5,8 +5,15 @@
     {
       "files": "*.html",
       "options": {
-        "parser": "angular"
+        "parser": "angular",
+        "htmlWhitespaceSensitivity": "ignore",
+        "singleAttributePerLine": true
       }
     }
-  ]
+  ],
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "trailingComma": "all",
+  "endOfLine": "lf"
 }
