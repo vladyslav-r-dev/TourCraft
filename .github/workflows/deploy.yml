@@ -1,0 +1,74 @@
+name: Deploy TourCraft
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Angular
+        run: npx ng build --configuration production --base-href "/${GITHUB_REPOSITORY#*/}/"
+
+      - name: Prepare GitHub Pages
+        id: prepare
+        run: |
+          index_file="$(find dist -type f -name index.html -print -quit)"
+
+          if [ -z "$index_file" ]; then
+            echo "Angular build output not found"
+            exit 1
+          fi
+
+          site_dir="$(dirname "$index_file")"
+
+          cp "$site_dir/index.html" "$site_dir/404.html"
+          touch "$site_dir/.nojekyll"
+
+          echo "site_dir=$site_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ steps.prepare.outputs.site_dir }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v4
